@@ -23,7 +23,7 @@ void timer_init(int sig){
             alarm(1);
     }
 }
-// commento
+
 int main(int argc, char** argv) {
     int srv_sd,
         shadow_sd,
