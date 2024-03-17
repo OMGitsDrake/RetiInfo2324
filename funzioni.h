@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "costanti.h"
 
+// se l'indice di una stanza e' valido o no
 int is_valid(int r){
     if(r > MAX_ROOMS)
         return -1;
@@ -11,6 +12,7 @@ void newline(){
     printf("\n");
 }
 
+// dato il puntatore fp cerca nel file auth.txt le credenziali passate come argomento
 int find_credentials(FILE *fp, char* usr, char* psw){
     char s_u[MAX_CR_SIZE];
     char s_p[MAX_CR_SIZE];
@@ -42,6 +44,8 @@ void print_resoconto(int timer, int raccolti, int mancanti){
     printf("\033[1;35mToken mancanti: %d\033[0m\n", mancanti);
 }
 
+// pulisce il buffer di ingresso dello standard input per evitare comportamenti anomali
+// durante l'input da tastiera
 void clean_stdin(){
     while (getchar() != '\n');
 }
