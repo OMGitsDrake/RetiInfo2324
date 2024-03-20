@@ -14,18 +14,10 @@
 #include "funzioni.h"
 
 int main(int argc, char** argv){
-    int listener, ret, len, serverfd, fdmax, i, port;
+    int listener, ret, len, serverfd, fdmax, i;
     struct sockaddr_in my_addr, cl_addr;
     fd_set master, work;
     pid_t pid;
-
-    // controllo porta passata da CLI
-    // if(argc == 1 || (atoi(argv[1]) <= 1023)){
-    //     printf("Default port selected\n");
-    //     port = DEFAULT_SM_PORT;
-    // }
-    // else
-    //     port = atoi(argv[1]);
 
     // init socket
     listener = socket(AF_INET, SOCK_STREAM, 0);
@@ -48,7 +40,7 @@ int main(int argc, char** argv){
         exit(1);
     }
 
-    printf("Shadowman running on port %d\n", port);
+    printf("Shadowman running on port %d\n", DEFAULT_SM_PORT);
     
     FD_ZERO(&master);
     FD_ZERO(&work);
