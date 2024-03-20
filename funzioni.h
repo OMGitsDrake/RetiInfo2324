@@ -49,3 +49,15 @@ void print_resoconto(int timer, int raccolti, int mancanti){
 void clean_stdin(){
     while (getchar() != '\n');
 }
+
+// Dato l'array degli oggetti e un oggetto restituisce 1 se
+// il giocatore possiede l'oggetto, 0 altrimenti
+int you_have(char objs[OBJECTS][MAX_DESCR_SIZE], char* arg){
+    int i;
+    for(i = 0; i < HOLDABLE; i++){
+        if(strcasecmp(objs[i], arg) == 0)
+            return 1;
+    }
+
+    return 0;
+}

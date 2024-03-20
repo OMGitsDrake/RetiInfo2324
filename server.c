@@ -31,6 +31,14 @@ int main(int argc, char** argv){
     else
         port = atoi(argv[1]);
 
+    printf("Server running\n> ");
+    char cmd[8] = "";
+    while(1){
+        scanf("%s", cmd);
+        if(strcmp(cmd, "start") == 0)
+            break;
+    }
+
     // inizializzazione socket
     sd = socket(AF_INET, SOCK_STREAM, 0);
     memset(&my_addr, 0, sizeof(my_addr));
@@ -206,7 +214,7 @@ int main(int argc, char** argv){
                                     .locations = {
                                             "Una finestra a vetro singolo, notate un **foglietto** un po' rovinato infilato nella chisura\n",
                                             "Notate subito i 4 cassetti del mobile, ma sul piano di legno c'è intagliata una **frase** che sembra un indovinello...\n",
-                                            "Sul tavolo c'è un vecchio **taccuino** scarabocchiato\n",
+                                            "Sul tavolo c'è un vecchio **taccuino** scarabocchiato e un paio di **forbici**\n",
                                             "Il camino è sporco e pieno di cenere, ma stranamente l'**attizzatoio** è bello splendente.\n",
                                             "La porta è chisa da un **lucchetto**\n"
                                     },
@@ -217,18 +225,20 @@ int main(int argc, char** argv){
                                         "Con cautela estraete il foglietto dalla finestra, una scritta dice: \"Sapere che giorno è oggi potrebbe aiutarti a uscire...\"\n",
                                         "Un lucchetto a combinazione numerica, per aprirlo c'è bisogno di sapere 4 cifre.\n",
                                         "Toccando e guardando meglio i cavi, una voce rieccheggia nella tua mente: \"Ricordati, INGEGNERIA NON PUO' NON ESSERE DIFFICILE\"\n",
-                                        "La frase incisa sul mobie recita: \"Nei calcolatori moderni gestisco le richieste di interruzione, da quante lettere è composto il mio nome?\"\n"
+                                        "La frase incisa sul mobie recita: \"Nei calcolatori moderni gestisco le richieste di interruzione, da quante lettere è composto il mio nome?\"\n",
+                                        "<PLACEHOLDER>\n"
                                     },
-                                    .obj_names = {"Attizzatoio", "Taccuino", "Foglietto", "Lucchetto", "Cavi", "Frase"},
+                                    .obj_names = {"Attizzatoio", "Taccuino", "Foglietto", "Lucchetto", "Cavi", "Frase", "Forbici"},
                                     .objs = {
                                         "Un attizzatoio d'ottone, osservandolo meglio notate che sul retro e' attaccato qualcosa",
                                         "Questo taccuino dall'aria trasandata sembra inutile: chi avrebbe voglia di sfogliarlo tutto?",
                                         "Il foglietto e' rovinato ma si riesce sempre a leggere qualcosa...",
                                         "Un lucchetto a combinazione numerica, per aprirlo c'è bisogno di sapere 4 cifre.",
                                         "Vecchi cavi telefonici, ormai quasi del tutto in disuso.\nSembrano privi di qualsiasi utilita' al momento...",
-                                        "Cercate di leggere la frase ma non e' scritta molto bene, ci mettete un po' per leggerla tutta"
+                                        "Cercate di leggere la frase ma non e' scritta molto bene, ci mettete un po' per leggerla tutta",
+                                        "Delle semplici forbici, sembrano abbastanza affilate"
                                     },
-                                    .solutions = {1, 2, 7, -1, -1, 4}
+                                    .solutions = {1, 2, 7, -1, -1, 4, -1}
                                 };
 
 // ===============================================================================
@@ -267,7 +277,7 @@ int main(int argc, char** argv){
 
                                 // invio descrizioni locations
                                 int i = 0;
-                                for(; i < 5 ; i++){
+                                for(; i < LOCATIONS ; i++){
                                     sprintf(buffer, "%s", st.locations[i]);
                                     dim = strlen(buffer);
                                     ret = send(new_sd, (void*)&dim, DIM_UINT16, 0);
@@ -285,7 +295,7 @@ int main(int argc, char** argv){
 
                                 // invio nomi locations
                                 i = 0;
-                                for(; i < 5 ; i++){
+                                for(; i < LOCATIONS ; i++){
                                     sprintf(buffer, "%s", st.location_names[i]);
                                     dim = strlen(buffer);
                                     ret = send(new_sd, (void*)&dim, DIM_UINT16, 0);
@@ -303,7 +313,7 @@ int main(int argc, char** argv){
 
                                 // invio descrizione oggetti
                                 i = 0;
-                                for(; i < 6; i++){
+                                for(; i < OBJECTS; i++){
                                     sprintf(buffer, "%s", st.objs[i]);
                                     dim = strlen(buffer);
                                     ret = send(new_sd, (void*)&dim, DIM_UINT16, 0);
@@ -321,7 +331,7 @@ int main(int argc, char** argv){
 
                                 // invio nomi oggetti
                                 i = 0;
-                                for(; i < 6; i++){
+                                for(; i < OBJECTS; i++){
                                     sprintf(buffer, "%s", st.obj_names[i]);
                                     dim = strlen(buffer);
                                     ret = send(new_sd, (void*)&dim, DIM_UINT16, 0);
@@ -339,7 +349,7 @@ int main(int argc, char** argv){
 
                                 // invio domande
                                 i = 0;
-                                for(; i < 6; i++){
+                                for(; i < OBJECTS; i++){
                                     sprintf(buffer, "%s", st.questions[i]);
                                     dim = strlen(buffer);
                                     ret = send(new_sd, (void*)&dim, DIM_UINT16, 0);
@@ -357,7 +367,7 @@ int main(int argc, char** argv){
 
                                 // invio soluzioni
                                 i = 0;
-                                for(; i < 6; i++){
+                                for(; i < SOLUTIONS; i++){
                                     ret = send(new_sd, (void*)&st.solutions[i], DIM_UINT8, 0);
                                     if(ret < DIM_UINT8){
                                         perror("Problemi con l'invio di una soluzione");

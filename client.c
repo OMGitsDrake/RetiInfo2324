@@ -29,11 +29,10 @@ int main(int argc, char** argv) {
         shadow_sd,
         ret,
         i,
-        port,
         raccolti = 0,
         mancanti = TOKENS,
         held = 0,
-        solved[OBJECTS] = {0, 0, 0, 0, 1, 0};
+        solved[OBJECTS] = {0, 0, 0, 0, 1, 0, 1};
     uint16_t len;
     struct sockaddr_in srv_addr;
     struct sockaddr_in shadow_addr;
@@ -46,25 +45,20 @@ int main(int argc, char** argv) {
 // ===============================================================================
 // ||                          CONNESSIONE AL SERVER                            ||
 // ===============================================================================
-    // controllo porta passata da CLI
-    if(argc == 1 || (atoi(argv[1]) <= 1023)){
-        printf("Default port selected\n");
-        port = DEFAULT_SVR_PORT;
-    }
-    else
-        port = atoi(argv[1]);
 
     srv_sd = socket(AF_INET, SOCK_STREAM, 0);
 
     memset(&srv_addr, 0, sizeof(srv_addr));
     srv_addr.sin_family = AF_INET;
-    srv_addr.sin_port = htons(port);
+    srv_addr.sin_port = htons(DEFAULT_SVR_PORT);
     inet_pton(AF_INET, LOCALHOST, &srv_addr.sin_addr);
 
-    ret = connect(srv_sd, (struct sockaddr *)&srv_addr, sizeof(srv_addr));
-    if (ret < 0){
-        perror("Connessione al server fallita");
-        exit(1);
+    while(1){
+        printf("Tento di connettermi al server\n");
+        ret = connect(srv_sd, (struct sockaddr *)&srv_addr, sizeof(srv_addr));
+        if(ret >= 0)
+            break;
+        sleep(4);
     }
 
 // ===============================================================================
@@ -76,7 +70,8 @@ int main(int argc, char** argv) {
     char re_psw[MAX_CR_SIZE];
     uint8_t log_sign, auth_res;
 
-    printf("Client running on port\n");
+    system("clear");
+    printf("Client running\n");
     printf("\033[1;31m    _/      _/    _/_/_/_/    _/        _/_/_/_/     _/_/_/_/     _/    _/     _/_/_/_/\n");
     printf("   _/ _/   _/    _/          _/        _/           _/    _/     _/_/ _/_/    _/       \n");
     printf("  _/_/ _/ _/    _/_/_/      _/        _/           _/    _/     _/  _/ _/    _/_/_/    \n");
@@ -92,9 +87,9 @@ int main(int argc, char** argv) {
 
     printf("\n\n1) Login\n2) Signup\n");
     l_s:
-    printf("-> ");
+    printf("> ");
     while(scanf("%hhu", &log_sign) != 1){
-        printf("Input errato, riprova!\n-> ");
+        printf("Input errato, riprova!\n> ");
         clean_stdin();
     }
     if(log_sign < 1 || log_sign > 2){
@@ -250,7 +245,7 @@ int main(int argc, char** argv) {
     sscanf(buffer, "%[^\n]s", st.descr);
 
     i = 0;
-    for(; i < 5; i ++){
+    for(; i < LOCATIONS; i ++){
         memset(buffer, '\0', MAX_BUFFER_SIZE);
         // ricevo la lunghezza di una location
         ret = recv(srv_sd, (void*)&len, DIM_UINT16, 0);
@@ -270,7 +265,7 @@ int main(int argc, char** argv) {
     }
 
     i = 0;
-    for(; i < 5; i ++){
+    for(; i < LOCATIONS; i ++){
         memset(buffer, '\0', MAX_BUFFER_SIZE);
         // ricevo la lunghezza di un nome di location
         ret = recv(srv_sd, (void*)&len, DIM_UINT16, 0);
@@ -290,7 +285,7 @@ int main(int argc, char** argv) {
     }
 
     i = 0;
-    for(; i < 6; i ++){
+    for(; i < OBJECTS; i ++){
         memset(buffer, '\0', MAX_BUFFER_SIZE);
         // ricevo la lunghezza di una descrizione oggetto
         ret = recv(srv_sd, (void*)&len, DIM_UINT16, 0);
@@ -310,7 +305,7 @@ int main(int argc, char** argv) {
     }
 
     i = 0;
-    for(; i < 6; i ++){
+    for(; i < OBJECTS; i ++){
         memset(buffer, '\0', MAX_BUFFER_SIZE);
         // ricevo la lunghezza del nome di un oggetto
         ret = recv(srv_sd, (void*)&len, DIM_UINT16, 0);
@@ -330,7 +325,7 @@ int main(int argc, char** argv) {
     }
 
     i = 0;
-    for(; i < 6; i ++){
+    for(; i < OBJECTS; i ++){
         memset(buffer, '\0', MAX_BUFFER_SIZE);
         // ricevo la lunghezza della domanda
         ret = recv(srv_sd, (void*)&len, DIM_UINT16, 0);
@@ -463,7 +458,19 @@ int main(int argc, char** argv) {
                 }
 
                 if(strcasecmp(arg1, "Cavi") == 0){
-                    printf("%s\n", st.questions[4]);
+                    if(solved[4] == 1){
+                        printf("I cavi sono ancora attaccati al muro, servirebbe qualcosa per tagliarne un pezzetto...\n");
+                    } else {
+                        int j;
+                        for(j = 0; j < OBJECTS; j++){
+                            if(strcmp(objs[j], "--") == 0){
+                                strcpy(objs[j], "Cavi");
+                                held++;
+                                printf("Hai raccolto \'%s\'", "Cavi");
+                                goto held_ext;
+                            }
+                        }
+                    }
                     goto held_ext;
                 }
 
@@ -476,7 +483,7 @@ int main(int argc, char** argv) {
                     if(strcasecmp(arg1, st.obj_names[i]) == 0){
                         if(solved[i] == 1){
                             int j;
-                            for(j = 0; j < OBJECTS; j++){
+                            for(j = 0; j < HOLDABLE; j++){
                                 if(strcmp(objs[j], "--") == 0){
                                     strcpy(objs[j], st.obj_names[i]);
                                     held++;
@@ -510,7 +517,7 @@ int main(int argc, char** argv) {
                         }
                     }
                 }
-                printf("%s non e' un oggetto!", arg1);
+                printf("\'%s\' non e' un oggetto!", arg1);
             } else {
                 goto help;
             }
@@ -557,9 +564,28 @@ int main(int argc, char** argv) {
             }
             
             if(strlen(arg1) != 0){
+                if(( strcasecmp(arg1, st.obj_names[4]) == 0) &&
+                    (strcasecmp(arg2, st.obj_names[6]) == 0) &&
+                    (you_have(objs, arg2))){
+                    
+                    if(solved[4] == 1){
+                        printf("Hai usato le forbici per tagliare un pezzo dei cavi!\n");
+                        solved[4]++;
+                        goto fin_use;
+                    } else {
+                        printf("%s\n", st.questions[4]);
+                        goto fin_use;
+                    }
+                }
+
+                if((strcasecmp(arg1, "Cavi") == 0) && (you_have(objs, arg1))){
+                    printf("%s", st.questions[4]);
+                    goto fin_use;
+                }
+
                 // il lucchetto puo' essere usato sempre non essendo prendibile.
                 // essendo la combinazione a 4 cifre attaccarlo a forza bruta non conviene.
-                if(strcasecmp(arg1, st.obj_names[4])){
+                if(strcasecmp(arg1, st.obj_names[3]) == 0){
                     printf("Stai provando a aprire il lucchetto con una combinazione. . .\n");
 
                     newline();
@@ -581,6 +607,7 @@ int main(int argc, char** argv) {
 
                         goto end;
                     } else
+                        sleep(3);
                         printf("\033[1;31mIl luchetto ancora non si apre...\033[0m\n");
 
                 } else {
@@ -590,6 +617,7 @@ int main(int argc, char** argv) {
                 goto help;
             }
 
+            fin_use:
             print_resoconto(timer, raccolti, mancanti);
         }
 // ===============================================================================
@@ -635,7 +663,7 @@ int main(int argc, char** argv) {
 
             uint8_t n;
             do{
-                printf("-> ");
+                printf("> ");
                 if(scanf("%hhu", &n) != 1){
                     printf("Input errato, inserire un numero tra 1 e 6!\n");
                     clean_stdin();

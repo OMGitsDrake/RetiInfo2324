@@ -3,15 +3,15 @@
 #define MAX_BUFFER_SIZE 1024
 #define MAX_DESCR_SIZE  512
 #define LOCATIONS       5
-#define OBJECTS         6
-#define SOLUTIONS       6
+#define OBJECTS         7
+#define SOLUTIONS       7
 #define HOLDABLE        3
 
 // connessioni
 #define LOCALHOST "127.0.0.1"
 #define DEFAULT_SVR_PORT 4242
 #define DEFAULT_CL_PORT 4242
-#define DEFAULT_SM_PORT 4243
+#define DEFAULT_SM_PORT 6020
 
 // varie
 #define TIMER_INIT  420
