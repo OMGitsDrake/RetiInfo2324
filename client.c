@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
     char arg1[MAX_DESCR_SIZE] = "";
     char arg2[MAX_DESCR_SIZE] = "";
     char objs[HOLDABLE][MAX_DESCR_SIZE] = {"--", "--", "--"};
+    char dots[3][5] = {".", ". .", ". . ."};
 
 // ===============================================================================
 // ||                          CONNESSIONE AL SERVER                            ||
@@ -53,12 +54,15 @@ int main(int argc, char** argv) {
     srv_addr.sin_port = htons(DEFAULT_SVR_PORT);
     inet_pton(AF_INET, LOCALHOST, &srv_addr.sin_addr);
 
+    i = 0;
     while(1){
-        printf("Tento di connettermi al server\n");
+        printf("Tento di connettermi al server%s\n", dots[i]);
         ret = connect(srv_sd, (struct sockaddr *)&srv_addr, sizeof(srv_addr));
         if(ret >= 0)
             break;
-        sleep(4);
+        i = (i+1)%3;
+        sleep(1);
+        system("clear");
     }
 
 // ===============================================================================

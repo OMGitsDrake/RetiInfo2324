@@ -33,6 +33,8 @@ void print_help(){
         "\033[1;35mtake object\033[0m\tDigitare insieme all'oggetto che si vuole prendere\n\n"
         "\033[1;35muse object1 [object2]\033[0m\tDigitare per utilizzare l'oggetto object1, se e' possibile si pissono far interagire due oggetti digitandone i nomi\n\n"
         "\033[1;35mobjs\033[0m\tDigitare per ottenere una lista degli oggetti attualmente posseduti\n\n"
+        "\033[1;35mdrop object\033[0m\tPermette di lasciare a terra un oggetto posseduto per fare spazio\n\n"
+        "\033[1;35mdiceroll\033[0m\tSfida lo Shadowman per ottenere temp extra (o perderlo)\n\n"
         "\033[1;35mend\033[0m\tSe digitato permette di arrendersi e terminare la partita\n\n"
     );
 }
